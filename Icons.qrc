@@ -1,0 +1,7 @@
+<RCC>
+    <qresource prefix="/ico">
+        <file>icons/icon.png</file>
+        <file>icons/icon2.png</file>
+        <file>icons/cd_player_icon_123822.png</file>
+    </qresource>
+</RCC>
