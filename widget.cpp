@@ -3,6 +3,7 @@
 #include <QStyle>
 #include <QFileDialog>
 #include <QDir>
+#include <QTime>
 
 Widget::Widget(QWidget *parent)
     : QWidget(parent)
@@ -23,10 +24,14 @@ Widget::Widget(QWidget *parent)
     ui->labelVolume->setText(QString("Volume: ").append(QString::number(m_player->volume())));
     ui->horizontalSliderVolume->setValue(m_player->volume());
 
+    connect(m_player, &QMediaPlayer::positionChanged,this,&Widget::on_position_changed);
+    connect(m_player, &QMediaPlayer::durationChanged,this,&Widget::on_duration_changed);
+
 }
 
 Widget::~Widget()
 {
+    delete m_player;
     delete ui;
 }
 
@@ -56,5 +61,25 @@ void Widget::on_horizontalSliderVolume_valueChanged(int value)
 void Widget::on_pushButtonPlay_clicked()
 {
     m_player->play();
+}
+
+void Widget::on_position_changed(qint64 position)
+{
+    ui->horizontalSliderProgress->setValue(position);
+    QTime qt_position = QTime::fromMSecsSinceStartOfDay(position);
+    ui->labelProgress->setText(QString("Position: ").append(qt_position.toString("mm:ss")));
+}
+
+void Widget::on_duration_changed(qint64 duration)
+{
+    ui->horizontalSliderProgress->setMaximum(duration);
+    QTime qt_duration = QTime::fromMSecsSinceStartOfDay(duration);
+    ui->labelDuration->setText(QString("Duration: ").append(qt_duration.toString("mm.ss")));
+}
+
+
+void Widget::on_horizontalSliderProgress_sliderMoved(int position)
+{
+    m_player->setPosition(position);
 }
 

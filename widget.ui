@@ -152,20 +152,20 @@
     <rect>
      <x>10</x>
      <y>120</y>
-     <width>71</width>
+     <width>131</width>
      <height>21</height>
     </rect>
    </property>
    <property name="text">
-    <string>Progress</string>
+    <string>Progress: </string>
    </property>
   </widget>
   <widget class="QLabel" name="labelDuration">
    <property name="geometry">
     <rect>
-     <x>506</x>
+     <x>470</x>
      <y>120</y>
-     <width>51</width>
+     <width>91</width>
      <height>20</height>
     </rect>
    </property>
