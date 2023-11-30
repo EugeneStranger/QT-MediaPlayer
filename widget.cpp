@@ -10,6 +10,7 @@ Widget::Widget(QWidget *parent)
     , ui(new Ui::Widget)
 {
     ui->setupUi(this);
+    muted = false;
     //              Buttons style:
     ui->pushButtonOpen->setIcon(style()->standardIcon(QStyle::SP_DriveCDIcon));
     ui->pushButtonPrev->setIcon(style()->standardIcon(QStyle::SP_MediaSkipBackward));
@@ -17,6 +18,7 @@ Widget::Widget(QWidget *parent)
     ui->pushButtonPause->setIcon(style()->standardIcon(QStyle::SP_MediaPause));
     ui->pushButtonStop->setIcon(style()->standardIcon(QStyle::SP_MediaStop));
     ui->pushButtonNext->setIcon(style()->standardIcon(QStyle::SP_MediaSkipForward));
+    ui->pushButtonMute->setIcon(style()->standardIcon(QStyle::SP_MediaVolume));
 
     //              Player init:
     m_player = new QMediaPlayer(this);
@@ -27,6 +29,18 @@ Widget::Widget(QWidget *parent)
     connect(m_player, &QMediaPlayer::positionChanged,this,&Widget::on_position_changed);
     connect(m_player, &QMediaPlayer::durationChanged,this,&Widget::on_duration_changed);
 
+    //              Playlist init:
+    m_playlist_model = new QStandardItemModel(this);
+    ui->tableViewPlayList->setModel(m_playlist_model);
+    m_playlist_model->setHorizontalHeaderLabels(QStringList() << "Audio track " << "File path ");
+    ui->tableViewPlayList->hideColumn(1);
+    ui->tableViewPlayList->horizontalHeader()->setStretchLastSection(true);
+    ui->tableViewPlayList->setEditTriggers(QAbstractItemView::NoEditTriggers);
+
+    m_playlist = new QMediaPlaylist(m_player);
+    m_player->setPlaylist(m_playlist);
+
+//    connect(this,&Widget::)
 }
 
 Widget::~Widget()
@@ -38,16 +52,32 @@ Widget::~Widget()
 
 void Widget::on_pushButtonOpen_clicked()
 {
-    QString file = QFileDialog::getOpenFileName
-            (
-                this,               //Родительское окно
-                tr("Open file"),    //Заголовок окна диалога
-                "C:\\Music",            //Рабочий каталог
-                tr("Audio files (*.mp3 *.flac)")
-                );
-    ui->labelComposition->setText(file);
-    m_player->setMedia(QUrl::fromLocalFile(file));
+//    QString file = QFileDialog::getOpenFileName
+//            (
+//                this,               //Родительское окно
+//                tr("Open file"),    //Заголовок окна диалога
+//                "C:\\Music",            //Рабочий каталог
+//                tr("Audio files (*.mp3 *.flac)")
+//                );
+//    ui->labelComposition->setText(file.split('/').last());
+//    this->setWindowTitle(QString("Winamp - ").append(file.split('/').last()));
+//    m_player->setMedia(QUrl::fromLocalFile(file));
 
+    QStringList files = QFileDialog::getOpenFileNames(
+
+                this,
+                "Open files",
+                "C:\\Music",
+                "Audio files (*.mp3 *.flac)"
+                );
+    for(QString filesPath: files)
+    {
+        QList<QStandardItem*>items;
+        items.append(new QStandardItem(QDir(filesPath).dirName()));
+        items.append(new QStandardItem(filesPath));
+        m_playlist_model->appendRow(items);
+        m_playlist->addMedia(QUrl(filesPath));
+    }
 }
 
 
@@ -81,5 +111,43 @@ void Widget::on_duration_changed(qint64 duration)
 void Widget::on_horizontalSliderProgress_sliderMoved(int position)
 {
     m_player->setPosition(position);
+}
+
+
+void Widget::on_pushButtonMute_clicked()
+{
+    muted = !muted;
+    m_player->setMuted(muted);
+    ui->pushButtonMute->setIcon(style()->standardIcon(muted?QStyle::SP_MediaVolumeMuted:QStyle::SP_MediaVolume));
+}
+
+
+void Widget::on_pushButtonPause_clicked()
+{
+    m_player->stop();
+}
+
+
+void Widget::on_pushButtonStop_clicked()
+{
+    m_player->stop();
+}
+
+
+void Widget::on_tableViewPlayList_doubleClicked(const QModelIndex &index)
+{
+
+}
+
+
+void Widget::on_pushButtonPrev_clicked()
+{
+    m_playlist->previous();
+}
+
+
+void Widget::on_pushButtonNext_clicked()
+{
+    m_playlist->next();
 }
 

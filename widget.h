@@ -3,6 +3,8 @@
 
 #include <QWidget>
 #include <QMediaPlayer>
+#include <QMediaPlaylist>
+#include <QStandardItemModel>
 
 QT_BEGIN_NAMESPACE
 namespace Ui { class Widget; }
@@ -29,9 +31,26 @@ private slots:
 
     void on_horizontalSliderProgress_sliderMoved(int position);
 
+    void on_pushButtonMute_clicked();
+
+    void on_pushButtonPause_clicked();
+
+    void on_pushButtonStop_clicked();
+
+    void on_tableViewPlayList_doubleClicked(const QModelIndex &index);
+
+    void on_pushButtonPrev_clicked();
+
+    void on_pushButtonNext_clicked();
+
 private:
     Ui::Widget *ui;
 
     QMediaPlayer* m_player;
+
+    bool muted;
+
+    QMediaPlaylist* m_playlist;
+    QStandardItemModel* m_playlist_model;
 };
 #endif // WIDGET_H
